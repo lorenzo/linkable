@@ -23,7 +23,7 @@ If you are using composer, add this to your composer.json file:
 	{
 		"extra": {
 			"installer-paths": {
-				"Plugin/SQS": ["lorenzo/linkable"]
+				"Plugin/Linkable": ["lorenzo/linkable"]
 		}
 	},
 		"require" : {
