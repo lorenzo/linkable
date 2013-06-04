@@ -1,0 +1,17 @@
+{
+    "name": "lorenzo/linkable",
+    "description": "CakePHP Linkable Behavior",
+    "type": "cakephp-plugin",
+    "keywords": ["cakephp", "behavior", "query", "model"],
+    "homepage": "https://github.com/lorenzo/linkable",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "José Lorenzo Rodríguez",
+            "role": "Maintainer"
+        }
+    ],
+    "require": {
+        "composer/installers": "*"
+    }
+}
