@@ -1,17 +1,110 @@
-### Linkable Plugin
-CakePHP Plugin - PHP 5 only
+# CakePHP Linkable Behavior #
 
-LinkableBehavior
-Light-weight approach for data mining on deep relations between models. 
-Join tables based on model relations to easily enable right to left find operations.
+Linkable behavior is a companion for the CakePHP built-in containable behavior. It helps fill the gaps that are
+not covered by containable: You will be able to contain association that are not directly associated with your model
+and to generate queries joining all specified models.
 
-Original behavior by rafaelbandeira3 on GitHub. Includes modifications from Terr, n8man, and Chad Jablonski
- 
+This is particularly useful when you want to filter results by conditions in a hasMany or hasAndBelongsToMany relationship.
+
+Original behavior by rafaelbandeira3 on GitHub.
+
 Licensed under The MIT License
 Redistributions of files must retain the above copyright notice.
-  
-This version is maintaned by:
-GiulianoB ( https://bitbucket.org/giulianob/linkable/ )
+
+## Requirements ##
+
+* CakePHP 2.x
+* PHP 5.2+
+
+## Installation ##
+
+If you are using composer, add this to your composer.json file:
+
+	{
+	  "extra": {
+		"installer-paths": {
+			"Plugin/SQS": ["lorenzo/linkable"]
+		}
+	  },
+	  "require" : {
+		"lorenzo/linkable": "master"
+	  }
+	}
+
+Otherwise just clone this repository inside your app/Plugin folder:
+
+	git clone git://github.com/lorenzo/linkable.git Plugin/Linkable
+
+### Enable plugin
+
+You need to enable the plugin your `app/Config/bootstrap.php` file:
+
+    CakePlugin::load('Linkable');
+
+### Configuration
+
+To use this behavior, add it to your AppModel:
+
+	<?php
+	class AppModel extends Model {
+
+		public $actsAs = array('Containable', 'Linkable.Linkable');
+
+	}
+
+## Usage
+
+
+Here's an example using both linkable
+
+Relationships involved:
+
+* CasesRun is the HABTM table of TestRun <-> TestCases
+* CasesRun belongsTo TestRun
+* CasesRun belongsTo User
+* CasesRun belongsTo TestCase
+* TestCase belongsTo TestSuite
+* TestSuite belongsTo TestHarness
+* CasesRun HABTM Tags
+
+    $this->TestRun->CasesRun->find('all', array(
+    	'link' => array(
+    		'User' => array('fields' => 'username'),
+    		'TestCase' => array('fields' => array('TestCase.automated', 'TestCase.name'),
+    			'TestSuite' => array('fields' => array('TestSuite.name'),
+    				'TestHarness' => array('fields' => array('TestHarness.name'))
+    			)
+    		)
+    	),
+    	'conditions' => array('test_run_id' => $id),
+    	'contain' => array(
+    		'Tag'
+    	),
+    	'fields' => array(
+    		'CasesRun.id', 'CasesRun.state', 'CasesRun.modified', 'CasesRun.comments'
+    	)
+    ))
+
+Output SQL:
+
+	SELECT `CasesRun`.`id`, `CasesRun`.`state`, `CasesRun`.`modified`, `CasesRun`.`comments`, `User`.`username`, `TestCase`.`automated`, `TestCase`.`name`, `TestSuite`.`name`, `TestHarness`.`name` FROM `cases_runs` AS `CasesRun` LEFT JOIN `users` AS `User` ON (`User`.`id` = `CasesRun`.`user_id`) LEFT JOIN `test_cases` AS `TestCase` ON (`TestCase`.`id` = `CasesRun`.`test_case_id`) LEFT JOIN `test_suites` AS `TestSuite` ON (`TestSuite`.`id` = `TestCase`.`test_suite_id`) LEFT JOIN `test_harnesses` AS `TestHarness` ON (`TestHarness`.`id` = `TestSuite`.`test_harness_id`) WHERE `test_run_id` = 32
+
+    SELECT `Tag`.`id`, `Tag`.`name`, `CasesRunsTag`.`id`, `CasesRunsTag`.`cases_run_id`, `CasesRunsTag`.`tag_id` FROM `tags` AS `Tag` JOIN `cases_runs_tags` AS `CasesRunsTag` ON (`CasesRunsTag`.`cases_run_id` IN (345325, 345326, 345327, 345328) AND `CasesRunsTag`.`tag_id` = `Tag`.`id`) WHERE 1 = 1
+
+If you were to try this example with containable, you would find that it generates a lot of queries to fetch all of the data records. Linkable produces a single query with joins instead.
+
+
+### Filtering a parent model by records in a child model:
+
+	$this->Article->find('all', array(
+		'contain' => array('Author'),
+		'link' => array('Comment' => array('conditions' => array('Comment.user_id' => 1)))
+	));
+
+Previous example will bring all articles having a comment done by user 1. Please notice that if there is more than one comment
+per article done by such user, this query will actually return an Article record per each comment made. This is because Linkable
+will use a single query using joins.
+
 
 ### version 1.1:
 - Brought in improvements and test cases from Terr. However, THIS VERSION OF LINKABLE IS NOT DROP IN COMPATIBLE WITH Terr's VERSION!
@@ -23,44 +116,6 @@ GiulianoB ( https://bitbucket.org/giulianob/linkable/ )
 
 - Linkable will no longer break queries that use SQL COUNTs
 
-### Complex Example
 
-Here's a complex example using both linkable and containable at the same time :)
-
-Relationships involved:  
-CasesRun is the HABTM table of TestRun <-> TestCases  
-CasesRun belongsTo TestRun  
-CasesRun belongsTo User  
-CasesRun belongsTo TestCase  
-TestCase belongsTo TestSuite  
-TestSuite belongsTo TestHarness  
-CasesRun HABTM Tags  
-
-    $this->TestRun->CasesRun->find('all', array(	
-    	'link' => array(
-    		'User' => array('fields' => 'username'), 
-    		'TestCase' => array('fields' => array('TestCase.automated', 'TestCase.name'),
-    			'TestSuite' => array('fields' => array('TestSuite.name'), 
-    				'TestHarness' => array('fields' => array('TestHarness.name'))
-    			)
-    		)
-    	),
-    	'conditions' => array('test_run_id' => $id),
-    	'contain' => array(
-    		'Tag'					
-    	),
-    	'fields' => array(
-    		'CasesRun.id', 'CasesRun.state', 'CasesRun.modified', 'CasesRun.comments'
-    	)
-    ))
-
-Output SQL:  
-
-    SELECT `CasesRun`.`id`, `CasesRun`.`state`, `CasesRun`.`modified`, `CasesRun`.`comments`, `User`.`username`, `TestCase`.`automated`, `TestCase`.`name`, `TestSuite`.`name`, `TestHarness`.`name` FROM `cases_runs` AS `CasesRun` LEFT JOIN `users` AS `User` ON (`User`.`id` = `CasesRun`.`user_id`) LEFT JOIN `test_cases` AS `TestCase` ON (`TestCase`.`id` = `CasesRun`.`test_case_id`) LEFT JOIN `test_suites` AS `TestSuite` ON (`TestSuite`.`id` = `TestCase`.`test_suite_id`) LEFT JOIN `test_harnesses` AS `TestHarness` ON (`TestHarness`.`id` = `TestSuite`.`test_harness_id`) WHERE `test_run_id` = 32
-
-    SELECT `Tag`.`id`, `Tag`.`name`, `CasesRunsTag`.`id`, `CasesRunsTag`.`cases_run_id`, `CasesRunsTag`.`tag_id` FROM `tags` AS `Tag` JOIN `cases_runs_tags` AS `CasesRunsTag` ON (`CasesRunsTag`.`cases_run_id` IN (345325, 345326, 345327, 345328) AND `CasesRunsTag`.`tag_id` = `Tag`.`id`) WHERE 1 = 1 
-
-If you were to try this example with containable, you would find that it generates a lot of queries to fetch all of the data records. Linkable produces a single query with joins instead.
-
-### More examples  
+### More examples
 Look into the unit tests for some more ways of using Linkable
