@@ -19,7 +19,7 @@ Redistributions of files must retain the above copyright notice.
 ## Installation ##
 
 If you are using composer, add this to your composer.json file:
-
+```json
 	{
 		"extra": {
 			"installer-paths": {
@@ -30,6 +30,7 @@ If you are using composer, add this to your composer.json file:
 			"lorenzo/linkable": "master"
 		}
 	}
+```
 
 Otherwise just clone this repository inside your app/Plugin folder:
 
@@ -44,18 +45,19 @@ CakePlugin::load('Linkable');
 ### Configuration
 
 To use this behavior, add it to your AppModel:
-
+```php
 	<?php
 		class AppModel extends Model {
 		
 			public $actsAs = array('Containable', 'Linkable.Linkable');
 		
 	}
+```
 
 ## Usage
 
 Here's an example using both linkable
-
+```php
 	<?php
 	$this->TestRun->CasesRun->find('all', array(
 		'link' => array(
@@ -74,7 +76,7 @@ Here's an example using both linkable
 			'CasesRun.id', 'CasesRun.state', 'CasesRun.modified', 'CasesRun.comments'
 			)
 		));
-
+```
 Relatioships:
 
 * CasesRun is the HABTM table of TestRun <-> TestCases
@@ -87,20 +89,29 @@ Relatioships:
 
 
 Output SQL:
-
+```sql
 	SELECT `CasesRun`.`id`, `CasesRun`.`state`, `CasesRun`.`modified`, `CasesRun`.`comments`, `User`.`username`, `TestCase`.`automated`, `TestCase`.`name`, `TestSuite`.`name`, `TestHarness`.`name` FROM `cases_runs` AS `CasesRun` LEFT JOIN `users` AS `User` ON (`User`.`id` = `CasesRun`.`user_id`) LEFT JOIN `test_cases` AS `TestCase` ON (`TestCase`.`id` = `CasesRun`.`test_case_id`) LEFT JOIN `test_suites` AS `TestSuite` ON (`TestSuite`.`id` = `TestCase`.`test_suite_id`) LEFT JOIN `test_harnesses` AS `TestHarness` ON (`TestHarness`.`id` = `TestSuite`.`test_harness_id`) WHERE `test_run_id` = 32
 
 	SELECT `Tag`.`id`, `Tag`.`name`, `CasesRunsTag`.`id`, `CasesRunsTag`.`cases_run_id`, `CasesRunsTag`.`tag_id` FROM `tags` AS `Tag` JOIN `cases_runs_tags` AS `CasesRunsTag` ON (`CasesRunsTag`.`cases_run_id` IN (345325, 345326, 345327, 345328) AND `CasesRunsTag`.`tag_id` = `Tag`.`id`) WHERE 1 = 1
-
+```
 If you were to try this example with containable, you would find that it generates a lot of queries to fetch all of the data records. Linkable produces a single query with joins instead.
 
 
 ### Filtering a parent model by records in a child model:
-
-	$this->Article->find('all', array(
-		'contain' => array('Author'),
-		'link' => array('Comment' => array('conditions' => array('Comment.user_id' => 1)))
-	));
+```php
+<?php
+$this->Article->find('all', array(
+	'contain' => array(
+		'Author'
+	),
+	'link' => array(
+		'Comment'
+	),
+	'conditions' => array(
+		'Comment.user_id' => 1
+	)
+));
+```
 
 Previous example will bring all articles having a comment done by user 1. Please notice that if there is more than one comment
 per article done by such user, this query will actually return an Article record per each comment made. This is because Linkable
