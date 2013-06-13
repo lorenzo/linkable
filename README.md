@@ -96,11 +96,20 @@ If you were to try this example with containable, you would find that it generat
 
 
 ### Filtering a parent model by records in a child model:
-
-	$this->Article->find('all', array(
-		'contain' => array('Author'),
-		'link' => array('Comment' => array('conditions' => array('Comment.user_id' => 1)))
-	));
+```php
+<?php
+$this->Article->find('all', array(
+	'contain' => array(
+		'Author'
+	),
+	'link' => array(
+		'Comment'
+	),
+	'conditions' => array(
+		'Comment.user_id' => 1
+	)
+));
+```
 
 Previous example will bring all articles having a comment done by user 1. Please notice that if there is more than one comment
 per article done by such user, this query will actually return an Article record per each comment made. This is because Linkable
