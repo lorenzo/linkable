@@ -17,6 +17,9 @@ class LinkableBehaviorTest extends CakeTestCase {
 		'plugin.linkable.legacy_company',
 		'plugin.linkable.shipment',
 		'plugin.linkable.order_item',
+		'plugin.linkable.news_article',
+		'plugin.linkable.news_category',
+		'plugin.linkable.news_articles_news_category',
 	);
 
 	public $User;
@@ -458,6 +461,40 @@ class LinkableBehaviorTest extends CakeTestCase {
 
 		$this->assertEquals($arrayExpected, $arrayResult, 'belongsTo association with alias (requested), with hasMany to the same model without alias: %s');
 	}
+        
+/**
+ * Ensure that the correct habtm keys are read from the relationship in the models
+ * 
+ * @author David Yell <neon1024@gmail.com>
+ * @return void
+ */
+        public function testHasAndBelongsToManyNonConvention() {
+            $this->NewsArticle = ClassRegistry::init('NewsArticle');
+            
+            $expected = array(
+                array(
+                    'NewsArticle' => array(
+                        'id' => '1',
+                        'title' => 'CakePHP the best framework'
+                    ),
+                    'NewsCategory' => array(
+                        'id' => '1',
+                        'name' => 'Development'
+                    )
+                )
+            );
+            
+            $result = $this->NewsArticle->find('all', array(
+                'link' => array(
+                    'NewsCategory'
+                ),
+                'conditions' => array(
+                    'NewsCategory.id' => 1
+                )
+            ));
+            
+            $this->assertEqual($result, $expected);
+        }
 }
 
 class TestModel extends CakeTestModel {
@@ -556,4 +593,28 @@ class OrderItem extends TestModel {
 			'foreignKey' => 'active_shipment_id',
 		),
 	);
+}
+
+class NewsArticle extends TestModel {
+    public $hasAndBelongsToMany = array(
+        'NewsCategory' => array(
+            'className' => 'NewsCategory',
+            'joinTable' => 'news_articles_news_categories',
+            'foreignKey' => 'article_id',
+            'associationForeignKey' => 'category_id',
+            'unique' => 'keepExisting',
+        )
+    );
+}
+
+class NewsCategory extends TestModel {
+    public $hasAndBelongsToMany = array(
+        'NewsArticle' => array(
+            'className' => 'NewsArticle',
+            'joinTable' => 'news_articles_news_categories',
+            'foreignKey' => 'category_id',
+            'associationForeignKey' => 'article_id',
+            'unique' => 'keepExisting',
+        )
+    );
 }
