@@ -21,12 +21,11 @@ class LinkableBehaviorTest extends CakeTestCase {
 
 	public $User;
 
-	public function startTest() {
-
-		$this->User	= ClassRegistry::init('User');
+	public function startTest($method) {
+		$this->User = ClassRegistry::init('User');
 	}
 	
-	public function endTest() {
+	public function endTest($method) {
 
 		unset($this->User);
 	}
@@ -199,33 +198,33 @@ class LinkableBehaviorTest extends CakeTestCase {
 			'User'	=> array('id' => 1, 'username' => 'CakePHP')
 		);
 
-		$arrayResult	= $this->Post->find('first', array(
+		$arrayResult = $this->Post->find('first', array(
 			'conditions'	=> array(
 				'MainTag.id'	=> 1
 			),
 			'link'	=> array(
-				'User'	=> array(					
-					'Profile'	=> array(
-						'fields'	=> array(
+				'User'	=> array(
+					'Profile' => array(
+						'fields' => array(
 							'biography'
 						),
-						'Generic'	=> array(
-							'class'			=> 'Generic',
-							'conditions'	=> array('exactly' => 'User.id = Generic.id'),
+						'Generic' => array(
+							'class'	=> 'Generic',
+							'conditions' => array('exactly' => 'User.id = Generic.id'),
 						)
 					)
 				),
-				'Tag'	=> array(
-					'table'		=> 'tags',
-					'fields'	=> array(
+				'Tag' => array(
+					'table'	=> 'tags',
+					'fields' => array(
 						'name'
 					)
 				),
-				'MainTag'	=> array(
+				'MainTag' => array(
 					'class'	=> 'Tag',
-					'conditions'	=> array('exactly' => 'PostsTag.post_id = Post.id'),
-					'fields'	=> array(
-						'MainTag.name'
+					'conditions' => array('exactly' => 'PostsTag.post_id = Post.id'),
+					'fields' => array(
+						'name'
 					)
 				)
 			)
