@@ -122,12 +122,13 @@ class LinkableBehavior extends ModelBehavior {
 								$Link = $_Model->{Inflector::classify($association['joinTable'])};
 							}
 							if (empty($modelLink)) {
-								$modelLink = $Link->escapeField(Inflector::underscore($_Model->alias) . '_id');
+								$modelLink = $Link->escapeField($association['foreignKey']);
 							}
 							if (empty($referenceLink)) {
-								$referenceLink = $Link->escapeField(Inflector::underscore($Reference->alias) . '_id');
+								$referenceLink = $Link->escapeField($association['associationForeignKey']);
 							}
 							$referenceKey = $Reference->escapeField();
+                                                        
 							$query['joins'][] = array(
 								'alias' => $Link->alias,
 								'table' => $Link->table, //$Link->getDataSource()->fullTableName($Link),
