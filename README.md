@@ -117,6 +117,10 @@ Previous example will bring all articles having a comment done by user 1. Please
 per article done by such user, this query will actually return an Article record per each comment made. This is because Linkable
 will use a single query using joins.
 
+### version 1.1.1
+
+- Using inner joins for filtering queries
+- Bug fixes
 
 ### version 1.1:
 - Brought in improvements and test cases from Terr. However, THIS VERSION OF LINKABLE IS NOT DROP IN COMPATIBLE WITH Terr's VERSION!
