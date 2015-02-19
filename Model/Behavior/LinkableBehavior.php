@@ -147,7 +147,7 @@ class LinkableBehavior extends ModelBehavior {
 					}
 
 					if (empty($options['table'])) {
-						$options['table'] = $_Model->table;
+						$options['table'] = $_Model->schemaName . '.' . $_Model->table;
 					}
 
 					// Decide whether we should mess with the fields or not
