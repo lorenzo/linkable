@@ -56,7 +56,7 @@ To use this behavior, add it to your AppModel:
 
 ## Usage
 
-Here's an example using both linkable
+Here's an example using both linkable and containable:
 ```php
 	<?php
 	$this->TestRun->CasesRun->find('all', array(
@@ -77,7 +77,7 @@ Here's an example using both linkable
 			)
 		));
 ```
-Relatioships:
+Relationships:
 
 * CasesRun is the HABTM table of TestRun <-> TestCases
 * CasesRun belongsTo TestRun
@@ -113,8 +113,8 @@ $this->Article->find('all', array(
 ));
 ```
 
-Previous example will bring all articles having a comment done by user 1. Please notice that if there is more than one comment
-per article done by such user, this query will actually return an Article record per each comment made. This is because Linkable
+The previous example will bring all articles having a comment done by user 1. Please note that if there is more than one comment
+per article from a user, this query will actually return an Article record per each comment made. This is because Linkable
 will use a single query using joins.
 
 ### version 1.1.1
@@ -123,7 +123,7 @@ will use a single query using joins.
 - Bug fixes
 
 ### version 1.1:
-- Brought in improvements and test cases from Terr. However, THIS VERSION OF LINKABLE IS NOT DROP IN COMPATIBLE WITH Terr's VERSION!
+- Brought in improvements and test cases from Terr. However, THIS VERSION OF LINKABLE IS NOT DROP-IN COMPATIBLE WITH Terr's VERSION!
 - If fields aren't specified, will now return all columns of that model
 - No need to specify the foreign key condition if a custom condition is given. Linkable will automatically include the foreign key relationship.
 - Ability to specify the exact condition Linkable should use. This is usually required when doing on-the-fly joins since Linkable generally assumes a belongsTo relationship when no specific relationship is found and may produce invalid foreign key conditions. Example:
