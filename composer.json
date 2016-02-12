@@ -2,7 +2,7 @@
     "name": "lorenzo/linkable",
     "description": "CakePHP Linkable Behavior",
     "type": "cakephp-plugin",
-    "keywords": ["cakephp", "behavior", "query", "model"],
+    "keywords": ["cakephp", "behavior", "query", "model", "contain", "containable", "deep associations"],
     "homepage": "https://github.com/lorenzo/linkable",
     "license": "MIT",
     "authors": [
