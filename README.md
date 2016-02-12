@@ -40,7 +40,7 @@ git clone git://github.com/lorenzo/linkable.git Plugin/Linkable
 
 You need to enable the plugin your `app/Config/bootstrap.php` file:
 
-CakePlugin::load('Linkable');
+``CakePlugin::load('Linkable');``
 
 ### Configuration
 
